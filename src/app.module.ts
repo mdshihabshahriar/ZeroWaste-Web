@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module.js';
+import { ReceiverProfilesModule } from './receiver-profiles/receiver-profiles.module.js';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module.js';
       synchronize: true,                    
     }),
     UsersModule,
+    ReceiverProfilesModule,
   ],
 })
 export class AppModule {}
