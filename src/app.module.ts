@@ -5,9 +5,12 @@ import { UsersModule } from './users/users.module.js';
 import { ReceiverProfilesModule } from './receiver-profiles/receiver-profiles.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -23,5 +26,6 @@ import { AuthModule } from './auth/auth.module.js';
     AuditLogsModule,
     AuthModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
