@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { FoodPostsModule } from './food-posts/food-posts.module.js';
+import { StatusHistoryModule } from './status-history/status-history.module.js';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { FoodPostsModule } from './food-posts/food-posts.module.js';
     AuditLogsModule,
     AuthModule,
     FoodPostsModule,
+    StatusHistoryModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
