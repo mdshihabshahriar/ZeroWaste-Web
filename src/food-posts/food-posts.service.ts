@@ -162,6 +162,57 @@ export class FoodPostsService {
     };
   }
 
+  
+  // Atomically accept a food post using a PostgreSQL row lock
+  async acceptFoodPost(id: number, user: AuthUser) {
+    return this.dataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(FoodPost);
+
+      const post = await repo.findOne({
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!post) {
+        throw new NotFoundException('Food post not found');
+      }
+
+      if (post.status !== FoodPostStatus.POSTED) {
+        throw new ConflictException(
+          'This food post is already accepted or unavailable',
+        );
+      }
+
+      if (post.pickupDeadline <= new Date()) {
+        throw new ConflictException(
+          'The pickup deadline has passed',
+        );
+      }
+
+      post.status = FoodPostStatus.ACCEPTED;
+      post.acceptedById = user.id;
+
+      const updatedPost = await repo.save(post);
+
+      await this.statusHistory.log(
+        post.id,
+        FoodPostStatus.POSTED,
+        FoodPostStatus.ACCEPTED,
+        user.id,
+        manager,
+      );
+
+      await this.notifications.create(
+        post.donorId,
+        `Your food donation "${post.title}" has been accepted.`,
+        manager,
+      );
+
+      return updatedPost;
+    });
+  }
+
+
   async findMine(donorId: number, q: DonorHistoryQueryDto) {
     const qb = this.repo
       .createQueryBuilder('p')
