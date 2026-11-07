@@ -40,6 +40,7 @@ export class CreateFoodPostDto {
   pickupDeadline: string;
  
   @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  @IsOptional()
 
   photo?: any;
 
