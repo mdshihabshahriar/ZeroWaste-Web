@@ -9,7 +9,6 @@ import { UploadsModule } from '../uploads/uploads.module.js';
 import { FoodPost } from './entities/food-posts.entity.js';
 import { FoodPostsController } from './food-posts.controller.js';
 import { FoodPostsService } from './food-posts.service.js';
-import { FoodPostsExpirationService } from './food-posts-expiration.service.js';
 
 @Module({
   imports: [
@@ -21,7 +20,6 @@ import { FoodPostsExpirationService } from './food-posts-expiration.service.js';
   controllers: [FoodPostsController],
   providers: [
     FoodPostsService,
-    FoodPostsExpirationService,
   ],
   exports: [TypeOrmModule, FoodPostsService],
 })
