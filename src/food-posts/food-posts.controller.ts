@@ -47,6 +47,16 @@ findNearby(@Query() query: NearbyFoodPostsQueryDto) {
   return this.service.findNearby(query);
 }
 
+  // View volunteer food donation history
+  @Get('volunteer/history')
+  @Roles(UserRole.VOLUNTEER)
+  findVolunteerHistory(
+    @CurrentUser('id') volunteerId: number,
+    @Query() query: DonorHistoryQueryDto,
+  ) {
+    return this.service.findVolunteerHistory(volunteerId, query);
+  }
+
   @Patch(':id/accept')
   @Roles(UserRole.VOLUNTEER)
   acceptFoodPost(

@@ -293,6 +293,43 @@ export class FoodPostsService {
     };
   }
 
+    // View food donations accepted by a volunteer
+  async findVolunteerHistory(
+    volunteerId: number,
+    q: DonorHistoryQueryDto,
+  ) {
+    const qb = this.repo
+      .createQueryBuilder('p')
+      .where('p.acceptedById = :volunteerId', { volunteerId })
+      .orderBy('p.createdAt', 'DESC')
+      .skip((q.page - 1) * q.limit)
+      .take(q.limit);
+
+    if (q.status) {
+      qb.andWhere('p.status = :status', { status: q.status });
+    }
+
+    if (q.from) {
+      qb.andWhere('p.createdAt >= :from', { from: q.from });
+    }
+
+    if (q.to) {
+      qb.andWhere('p.createdAt <= :to', { to: q.to });
+    }
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page: q.page,
+        limit: q.limit,
+        total,
+        totalPages: Math.ceil(total / q.limit),
+      },
+    };
+  }
+
   async findOne(id: number, user: AuthUser) {
     const post = await this.repo.findOneBy({ id });
     if (!post) throw new NotFoundException('Food post not found');
