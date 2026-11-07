@@ -5,6 +5,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
+
 import { UsersModule } from './users/users.module.js';
 import { ReceiverProfilesModule } from './receiver-profiles/receiver-profiles.module.js';
 import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
@@ -14,10 +16,13 @@ import { StatusHistoryModule } from './status-history/status-history.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
 import { FoodRequestsModule } from './food-requests/food-requests.module.js';
+import { SchedulerModule } from './scheduler/scheduler.module.js';
+import { RatingsModule } from './ratings/ratings.module.js';
 
 @Module({
   imports: [
-    
+    ScheduleModule.forRoot(),
+
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -44,7 +49,13 @@ import { FoodRequestsModule } from './food-requests/food-requests.module.js';
     StatusHistoryModule,
     NotificationsModule,
     UploadsModule,
+
+    // Member 3
     FoodRequestsModule,
+
+    // Main branch
+    SchedulerModule,
+    RatingsModule,
   ],
   providers: [
     {
