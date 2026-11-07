@@ -1,17 +1,19 @@
+
 import {
   Injectable,
   NotFoundException,
   ConflictException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, MoreThan, Repository } from 'typeorm';
 import {
   FoodRequest,
   FoodRequestStatus,
 } from './entities/food-request.entity.js';
-import { FoodPost, FoodPostStatus } from '../food-posts/entities/food-posts.entity.js';
-import { UserRole } from '../users/entities/user.entity.js';
+import {
+  FoodPost,
+  FoodPostStatus,
+} from '../food-posts/entities/food-posts.entity.js';
 
 @Injectable()
 export class FoodRequestsService {
@@ -27,15 +29,17 @@ export class FoodRequestsService {
       .find({
         where: {
           status: FoodPostStatus.POSTED,
+          receiverId: IsNull(),
+          pickupDeadline: MoreThan(new Date()),
         },
         select: {
-          'id': true,
-          'title': true,
-          'description': true,
-          'foodType': true,
-          'portions': true,
-          'pickupDeadline': true,
-          'createdAt': true,
+          id: true,
+          title: true,
+          description: true,
+          foodType: true,
+          portions: true,
+          pickupDeadline: true,
+          createdAt: true,
         },
         order: {
           createdAt: 'DESC',
@@ -66,6 +70,12 @@ export class FoodRequestsService {
 
       if (post.pickupDeadline <= new Date()) {
         throw new ConflictException('The pickup deadline has passed');
+      }
+
+      if (post.receiverId !== null && post.receiverId !== undefined) {
+        throw new ConflictException(
+          'This food donation has already been assigned to another receiver',
+        );
       }
 
       const existingRequest = await requestRepo.findOne({
