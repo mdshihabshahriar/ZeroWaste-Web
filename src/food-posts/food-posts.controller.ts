@@ -47,6 +47,14 @@ findNearby(@Query() query: NearbyFoodPostsQueryDto) {
   return this.service.findNearby(query);
 }
 
+  @Patch(':id/accept')
+  @Roles(UserRole.VOLUNTEER)
+  acceptFoodPost(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.acceptFoodPost(id, user);
+  }
  
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: AuthUser) {
