@@ -12,6 +12,7 @@ import { CreateFoodPostDto } from './dto/create-food-post.dto.js';
 import { DonorHistoryQueryDto } from './dto/donor-history-query.dto.js';
 import { UpdateFoodPostDto } from './dto/update-food-post.dto.js';
 import { FoodPostsService } from './food-posts.service.js';
+import { NearbyFoodPostsQueryDto } from './dto/nearby-food-posts-query.dto.js';
  
 type AuthUser = { id: number; role: UserRole };
  
@@ -37,6 +38,41 @@ export class FoodPostsController {
   @Roles(UserRole.DONOR)
   findMine(@CurrentUser() user: AuthUser, @Query() query: DonorHistoryQueryDto) {
     return this.service.findMine(user.id, query);
+  }
+
+  
+@Get('nearby')
+@Roles(UserRole.VOLUNTEER)
+findNearby(@Query() query: NearbyFoodPostsQueryDto) {
+  return this.service.findNearby(query);
+}
+
+  // View volunteer food donation history
+  @Get('volunteer/history')
+  @Roles(UserRole.VOLUNTEER)
+  findVolunteerHistory(
+    @CurrentUser('id') volunteerId: number,
+    @Query() query: DonorHistoryQueryDto,
+  ) {
+    return this.service.findVolunteerHistory(volunteerId, query);
+  }
+
+  @Patch(':id/accept')
+  @Roles(UserRole.VOLUNTEER)
+  acceptFoodPost(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.acceptFoodPost(id, user);
+  }
+
+    @Patch(':id/pickup')
+  @Roles(UserRole.VOLUNTEER)
+  markAsPickedUp(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.service.markAsPickedUp(id, user);
   }
  
   @Get(':id')
