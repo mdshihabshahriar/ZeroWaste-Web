@@ -1,7 +1,9 @@
+
 import {
   Controller,
   Get,
   Post,
+  Patch,
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -32,5 +34,15 @@ export class FoodRequestsController {
     @CurrentUser('id') receiverId: number,
   ) {
     return this.service.requestFood(postId, receiverId);
+  }
+
+  // Receiver confirms food delivery
+  @Patch(':postId/confirm-delivery')
+  @Roles(UserRole.RECEIVER)
+  confirmDelivery(
+    @Param('postId', ParseIntPipe) postId: number,
+    @CurrentUser('id') receiverId: number,
+  ) {
+    return this.service.confirmDelivery(postId, receiverId);
   }
 }
