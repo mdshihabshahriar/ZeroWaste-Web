@@ -12,6 +12,7 @@ import { StatusHistoryModule } from './status-history/status-history.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
 import { SchedulerModule } from './scheduler/scheduler.module.js';
+import { RatingsModule } from './ratings/ratings.module.js';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SchedulerModule } from './scheduler/scheduler.module.js';
     NotificationsModule,
     UploadsModule,
     SchedulerModule,
+    RatingsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
