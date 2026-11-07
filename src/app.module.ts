@@ -11,6 +11,7 @@ import { FoodPostsModule } from './food-posts/food-posts.module.js';
 import { StatusHistoryModule } from './status-history/status-history.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { UploadsModule } from './uploads/uploads.module.js';
+import { FoodRequestsModule } from './food-requests/food-requests.module.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
     StatusHistoryModule,
     NotificationsModule,
     UploadsModule,
+    FoodRequestsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
