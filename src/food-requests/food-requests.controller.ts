@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { UserRole } from '../users/entities/user.entity.js';
+import { DonorHistoryQueryDto } from '../food-posts/dto/donor-history-query.dto.js';
 import { FoodRequestsService } from './food-requests.service.js';
 
 @ApiTags('food-requests')
@@ -34,6 +36,16 @@ export class FoodRequestsController {
     @CurrentUser('id') receiverId: number,
   ) {
     return this.service.requestFood(postId, receiverId);
+  }
+
+  // Receiver views their food request history
+  @Get('my-history')
+  @Roles(UserRole.RECEIVER)
+  findReceiverHistory(
+    @CurrentUser('id') receiverId: number,
+    @Query() query: DonorHistoryQueryDto,
+  ) {
+    return this.service.findReceiverHistory(receiverId, query);
   }
 
   // Receiver confirms food delivery

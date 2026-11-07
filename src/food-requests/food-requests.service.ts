@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { StatusHistoryService } from '../status-history/status-history.service.js';
 import { NotificationsService } from '../notifications/notifications.service.js';
+import { DonorHistoryQueryDto } from '../food-posts/dto/donor-history-query.dto.js';
 import {
   Injectable,
   NotFoundException,
@@ -110,6 +111,41 @@ export class FoodRequestsService {
       return request;
     });
   }
+
+  // View food requests made by a receiver
+  async findReceiverHistory(
+    receiverId: number,
+    q: DonorHistoryQueryDto,
+  ) {
+    const qb = this.foodRequestRepo
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.post', 'post')
+      .where('request.receiverId = :receiverId', { receiverId })
+      .orderBy('request.requestedAt', 'DESC')
+      .skip((q.page - 1) * q.limit)
+      .take(q.limit);
+
+    if (q.from) {
+      qb.andWhere('request.requestedAt >= :from', { from: q.from });
+    }
+
+    if (q.to) {
+      qb.andWhere('request.requestedAt <= :to', { to: q.to });
+    }
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page: q.page,
+        limit: q.limit,
+        total,
+        totalPages: Math.ceil(total / q.limit),
+      },
+    };
+  }
+
     // Receiver confirms that the food donation has been delivered
   async confirmDelivery(postId: number, receiverId: number) {
     return this.dataSource.transaction(async (manager) => {
