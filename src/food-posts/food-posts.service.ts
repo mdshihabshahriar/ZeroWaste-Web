@@ -212,6 +212,53 @@ export class FoodPostsService {
     });
   }
 
+    // Mark an accepted food post as picked up by its assigned volunteer
+  async markAsPickedUp(id: number, user: AuthUser) {
+    return this.dataSource.transaction(async (manager) => {
+      const repo = manager.getRepository(FoodPost);
+
+      const post = await repo.findOne({
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!post) {
+        throw new NotFoundException('Food post not found');
+      }
+
+      if (post.acceptedById !== user.id) {
+        throw new ForbiddenException(
+          'Only the volunteer who accepted this food post can pick it up',
+        );
+      }
+
+      if (post.status !== FoodPostStatus.ACCEPTED) {
+        throw new ConflictException(
+          'Only accepted food posts can be marked as picked up',
+        );
+      }
+
+      post.status = FoodPostStatus.PICKED_UP;
+
+      const updatedPost = await repo.save(post);
+
+      await this.statusHistory.log(
+        post.id,
+        FoodPostStatus.ACCEPTED,
+        FoodPostStatus.PICKED_UP,
+        user.id,
+        manager,
+      );
+
+      await this.notifications.create(
+        post.donorId,
+        `Your food donation "${post.title}" has been picked up.`,
+        manager,
+      );
+
+      return updatedPost;
+    });
+  }
 
   async findMine(donorId: number, q: DonorHistoryQueryDto) {
     const qb = this.repo
