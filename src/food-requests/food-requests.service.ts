@@ -1,4 +1,6 @@
-
+import { DataSource } from 'typeorm';
+import { StatusHistoryService } from '../status-history/status-history.service.js';
+import { NotificationsService } from '../notifications/notifications.service.js';
 import {
   Injectable,
   NotFoundException,
@@ -18,9 +20,12 @@ import {
 @Injectable()
 export class FoodRequestsService {
   constructor(
-    @InjectRepository(FoodRequest)
-    private readonly foodRequestRepo: Repository<FoodRequest>,
-  ) {}
+  @InjectRepository(FoodRequest)
+  private readonly foodRequestRepo: Repository<FoodRequest>,
+  private readonly dataSource: DataSource,
+  private readonly statusHistory: StatusHistoryService,
+  private readonly notifications: NotificationsService,
+) {}
 
   // Browse available food donations as a receiver
   async browseAvailableFood() {
@@ -103,6 +108,75 @@ export class FoodRequestsService {
       await postRepo.save(post);
 
       return request;
+    });
+  }
+    // Receiver confirms that the food donation has been delivered
+  async confirmDelivery(postId: number, receiverId: number) {
+    return this.dataSource.transaction(async (manager) => {
+      const postRepo = manager.getRepository(FoodPost);
+      const requestRepo = manager.getRepository(FoodRequest);
+
+      const post = await postRepo.findOne({
+        where: { id: postId },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!post) {
+        throw new NotFoundException('Food post not found');
+      }
+
+      if (post.receiverId !== receiverId) {
+        throw new ConflictException(
+          'Only the assigned receiver can confirm this delivery',
+        );
+      }
+
+      if (post.status !== FoodPostStatus.PICKED_UP) {
+        throw new ConflictException(
+          'Only picked-up food donations can be confirmed as delivered',
+        );
+      }
+
+      post.status = FoodPostStatus.DELIVERED;
+
+      const updatedPost = await postRepo.save(post);
+
+      const foodRequest = await requestRepo.findOne({
+        where: {
+          postId,
+          receiverId,
+          status: FoodRequestStatus.ACCEPTED,
+        },
+      });
+
+      if (foodRequest) {
+        foodRequest.status = FoodRequestStatus.DELIVERED;
+        await requestRepo.save(foodRequest);
+      }
+
+      await this.statusHistory.log(
+        post.id,
+        FoodPostStatus.PICKED_UP,
+        FoodPostStatus.DELIVERED,
+        receiverId,
+        manager,
+      );
+
+      await this.notifications.create(
+        post.donorId,
+        `Your food donation "${post.title}" has been delivered successfully.`,
+        manager,
+      );
+
+      if (post.acceptedById) {
+        await this.notifications.create(
+          post.acceptedById,
+          `The receiver has confirmed delivery of "${post.title}".`,
+          manager,
+        );
+      }
+
+      return updatedPost;
     });
   }
 }

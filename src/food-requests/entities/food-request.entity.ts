@@ -15,6 +15,7 @@ export enum FoodRequestStatus {
   ACCEPTED = 'ACCEPTED',
   REJECTED = 'REJECTED',
   CANCELLED = 'CANCELLED',
+  DELIVERED = 'DELIVERED',
 }
 
 @Entity('food_requests')
