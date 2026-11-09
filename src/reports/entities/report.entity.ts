@@ -1,7 +1,7 @@
 import {
   Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn,
 } from 'typeorm';
-import { FoodPost } from '../../food-posts/entities/food-post.entity.js';
+import { FoodPost } from '../../food-posts/entities/food-posts.entity.js';
 import { User } from '../../users/entities/user.entity.js';
 
 export enum ReportStatus {
