@@ -11,6 +11,7 @@ export enum FoodPostStatus {
   DELIVERED = 'DELIVERED',
   EXPIRED = 'EXPIRED',
   CANCELLED = 'CANCELLED',
+  REMOVED = 'REMOVED',            
 }
  
 @Entity('food_posts')
@@ -76,6 +77,9 @@ export class FoodPost {
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'receiverId' })
   receiver: User | null;
+
+  @Column({ type: 'text', nullable: true })
+  removeReason: string | null;    
  
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
