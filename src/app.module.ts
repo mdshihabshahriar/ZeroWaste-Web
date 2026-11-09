@@ -19,6 +19,7 @@ import { RatingsModule } from './ratings/ratings.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ReportsModule } from './reports/reports.module.js';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ReportsModule } from './reports/reports.module.js';
     SchedulerModule,
     RatingsModule,
     ReportsModule,
+    AdminModule,
   ],
   providers: [
     {
