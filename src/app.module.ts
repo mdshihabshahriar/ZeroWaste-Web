@@ -7,6 +7,7 @@ import { AuditLogsModule } from './audit-logs/audit-logs.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ReportsModule } from './reports/reports.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { APP_GUARD } from '@nestjs/core';
     ReceiverProfilesModule,
     AuditLogsModule,
     AuthModule,
+    ReportsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
