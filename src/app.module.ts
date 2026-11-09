@@ -3,8 +3,6 @@ import 'dotenv/config';
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { UsersModule } from './users/users.module.js';
@@ -18,6 +16,10 @@ import { UploadsModule } from './uploads/uploads.module.js';
 import { FoodRequestsModule } from './food-requests/food-requests.module.js';
 import { SchedulerModule } from './scheduler/scheduler.module.js';
 import { RatingsModule } from './ratings/ratings.module.js';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ReportsModule } from './reports/reports.module.js';
+import { AdminModule } from './admin/admin.module.js';
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { RatingsModule } from './ratings/ratings.module.js';
     // Main branch
     SchedulerModule,
     RatingsModule,
+    ReportsModule,
+    AdminModule,
   ],
   providers: [
     {
