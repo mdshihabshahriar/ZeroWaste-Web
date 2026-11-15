@@ -161,7 +161,44 @@ export class FoodPostsService {
       },
     };
   }
+async dashboard(donorId: number) {
 
+  const rows = await this.repo
+
+    .createQueryBuilder('p')
+
+    .select('p.status', 'status')
+
+    .addSelect('COUNT(*)', 'count')
+
+    .addSelect('COALESCE(SUM(p.portions), 0)', 'portions')
+
+    .where('p.donorId = :donorId', { donorId })
+
+    .groupBy('p.status')
+
+    .getRawMany<{ status: FoodPostStatus; count: string; portions: string }>();
+ 
+  const byStatus: Record<string, number> = {};
+
+  let totalPosts = 0;
+
+  let mealsDelivered = 0;
+
+  for (const r of rows) {
+
+    byStatus[r.status] = Number(r.count);
+
+    totalPosts += Number(r.count);
+
+    if (r.status === FoodPostStatus.DELIVERED) mealsDelivered = Number(r.portions);
+
+  }
+
+  return { totalPosts, mealsDelivered, byStatus };
+
+}
+ 
   
   // Atomically accept a food post using a PostgreSQL row lock
   async acceptFoodPost(id: number, user: AuthUser) {

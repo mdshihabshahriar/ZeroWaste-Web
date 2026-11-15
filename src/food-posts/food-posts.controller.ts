@@ -39,6 +39,12 @@ export class FoodPostsController {
   findMine(@CurrentUser() user: AuthUser, @Query() query: DonorHistoryQueryDto) {
     return this.service.findMine(user.id, query);
   }
+  
+  @Get('my/dashboard')
+  @Roles(UserRole.DONOR)
+  dashboard(@CurrentUser() user: AuthUser) {
+    return this.service.dashboard(user.id);
+  }
 
   
 @Get('nearby')
