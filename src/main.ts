@@ -1,8 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import helmet from 'helmet';
+import * as helmetModule from 'helmet';
 import { AppModule } from './app.module.js';
+
+const helmet = (helmetModule as any).default ?? helmetModule;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,4 +25,5 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap();
