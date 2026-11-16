@@ -1,12 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { createRequire } from 'node:module';
-import type { RequestHandler } from 'express';
+import helmet from 'helmet';
 import { AppModule } from './app.module.js';
-
-const require = createRequire(import.meta.url);
-const helmet = require('helmet') as () => RequestHandler;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
